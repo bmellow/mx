@@ -1,0 +1,34 @@
+#!/bin/bash
+
+clear
+
+# parser tests
+
+#./mx.byte ../mixTests/parser/pTest1.mx pTest1.c -d  2>mx.ll
+#./mx.byte ../mixTests/parser/pTest2.mx pTest2.c -d  2>mx.ll
+#./mx.byte ../mixTests/parser/pTest3.mx pTest3.c -d  2>mx.ll
+#./mx.byte ../mixTests/parser/pTest4.mx pTest4.c -d  2>mx.ll
+#./mx.byte ../mixTests/parser/pTest5.mx pTest5.c -d  2>mx.ll
+#./mx.byte ../mixTests/parser/pTest6.mx 2>mx.ll
+#./mx.byte ../mixTests/parser/pTest7.mx 2>mx.ll
+#./mx.byte ../mixTests/parser/pTest8.mx 2>mx.ll
+#./mx.byte ../mixTests/parser/pTest9.mx 2>mx.ll
+#./mx.byte ../mixTests/parser/pTest10.mx 2>mx.ll
+#./mx.byte ../mixTests/parser/pTest11.mx 2>mx.ll
+#./mx.byte ../mixTests/parser/pTest12.mx 2>mx.ll
+#./mx.byte ../mixTests/parser/pTest13.mx 2>mx.ll
+#./mx.byte ../mixTests/parser/pTest14.mx 2>mx.ll
+
+
+#./mx.byte test.mx test.c -d  2>mx.ll
+#./mx.byte test3.mx test3.c -d  2>mx.ll
+#./mx.byte stack.mx stack.c -d 2>mx.ll
+#/mx.byte point.mx point.c -d 2>mx.ll
+./mx.byte comlan.mx comlan.c -d 2>mx.ll
+#./mx.byte proxyPattern.mx proxyPattern.c -d 2>mx.ll
+#./mx.byte chainOfResponsibilityPattern.mx chainOfResponsibilityPattern.c -d 2>mx.ll
+#./mx.byte stackImplementsExample.mx stackImplementsExample.c -d 2>mx.ll
+#./mx.byte pl.mx pl.c -d 2>mx.ll
+
+#lli mx.ll
+

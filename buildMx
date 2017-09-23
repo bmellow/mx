@@ -1,0 +1,6 @@
+#/bin/bash
+clear
+
+#ocamlbuild -cflags '-I /usr/local/lib/ocaml -g' -lflags  '-I /usr/local/lib/ocaml llvm_executionengine.cma -g' -lflags '-I /usr/local/lib/ocaml llvm_target.cma -g'  mx.byte
+
+ocamlbuild -cflags '-I /usr/local/lib/ocaml -g' -lflags  '-I /usr/local/lib/ocaml'  mx.byte

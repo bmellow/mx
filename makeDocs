@@ -1,0 +1,14 @@
+#/bin/bash
+clear
+
+# full output
+#ocamldoc -I /usr/local/lib/ocaml -I ./_build -d ./doc -o ./doc/mxDoc.tex -latex *.ml > err.log
+#ocamldoc -I /usr/local/lib/ocaml -I ./_build -d ./doc -o ./doc/mxDoc.dot -dot   *.ml > err.log
+#dot -Tpng ./doc/mxDoc.dot -o./doc/mxDiagram.png
+
+#only ast and symtbl
+ocamldoc -I /usr/local/lib/ocaml -I ./_build -d ./doc -o ./doc/mxDoc.tex -latex ast.ml symtbl.ml > err.log
+ocamldoc -I /usr/local/lib/ocaml -I ./_build -d ./doc -o ./doc/mxDoc.dot -dot   ast.ml symtbl.ml > err.log
+dot -Tpng ./doc/mxDoc.dot -o./doc/mxDiagram.png
+
+
