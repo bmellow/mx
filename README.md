@@ -7,6 +7,12 @@ The code contained in this repository is an prototype implementation of a compil
 
 The compiler implementation is written in OCaml, a functional language with support for object-oriented development. Here we provide a summary of the files created for the project.
 
+# Project dependencies
+
+- *ocaml* - (version 4.02.1)
+- *camlp4* - (https://opam.ocaml.org/packages/camlp4/)
+
+
 # Language definition modules 
 
 - *token.ml* (defines tokens that are used by lexer)
