@@ -1,11 +1,11 @@
 open Symtbl
 open Ast
-open Name
+(*open Name*)
 open Pgmvalues
 open Langtypes
 
 (* open Lookup *)
-open Cstrings
+(*open Cstrings *)
 
 
 exception Error of string
@@ -13,9 +13,16 @@ exception Error of string
 
 module ObjectC = 
 struct
+(**
+{b ObjectC module} 
+
+This module provides a C implementation of the "object class" found in 
+all mx programs.  All classes in mx extend the Object class.
+
+*)
+
 
 let object_static_code packContext = 
- 
 
 
 let cIncludeList = String.concat ""

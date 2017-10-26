@@ -43,114 +43,114 @@ open TTest007
 let truth_method = function
   | true -> print_string "true result"
   | false ->  print_string "false result"
-	
+    
 (** used for unit testing of parser.  Makes sure that AST
     created when the parser processes input program
-		is the same as the one expected.  
-*)	
-		
-			
-(*	
+        is the same as the one expected.  
+*)  
+        
+            
+(*  
 let unitTestForParser fstrm testAst gCon strTestName =  
     let aAndg = Parser.parse_document gCon fstrm in
     AstPrint.print_ast_package (fst aAndg);
     let check = (testAst = (fst aAndg)) in
     print_string strTestName;
-    truth_method check; print_endline ""	
+    truth_method check; print_endline ""    
 
 *)
 
 (** instantiate/initialize the global variables for the program.  These 
-	variables are contained in a tuple composed of the symbol tables and a queue storing the data*) 
+    variables are contained in a tuple composed of the symbol tables and a queue storing the data*) 
 let glb_init =
 
  
-	
+    
  (* initialize symbol tables *)
-	let typeSt =  Stack.create () in	
-		SymTbl.sym_add_level_to_typ_symtbl typeSt; 
+    let typeSt =  Stack.create () in    
+        SymTbl.sym_add_level_to_typ_symtbl typeSt; 
 
   let codegenSt =  Stack.create () in 
     SymTbl.sym_add_level_to_cg_symtbl codegenSt;
-		
-	let cCodeQueue = Queue.create () in
-	   (* Queue.add "\n" cCodeQueue *)
+        
+    let cCodeQueue = Queue.create () in
+       (* Queue.add "\n" cCodeQueue *)
     
   let needsTable:(string,string list) Hashtbl.t = Hashtbl.create 107 in
-		
+        
   let res = ( typeSt, codegenSt, needsTable, cCodeQueue ) in
-	res
-	
+    res
+    
 
 let main () =
-	print_endline "main() - begins";
-	
-	(** Install standard binary operators. 1 is the lowest precedence. *)
+    print_endline "main() - begins";
+    
+    (** Install standard binary operators. 1 is the lowest precedence. *)
   print_endline "main() - build operator precedence table";
-	
+    
   (** boolean operators *)
   Hashtbl.add Parser.binop_precedence Token.AND 20;    (* lowest *)
   Hashtbl.add Parser.binop_precedence Token.OR 20;
 
-		
-	(** relational operators *)
+        
+    (** relational operators *)
   Hashtbl.add Parser.binop_precedence Token.LSS 30;
   Hashtbl.add Parser.binop_precedence Token.GTR 30;
   Hashtbl.add Parser.binop_precedence Token.LEQ 30;
   Hashtbl.add Parser.binop_precedence Token.GEQ 30;
   Hashtbl.add Parser.binop_precedence Token.EQL 30;
   Hashtbl.add Parser.binop_precedence Token.NEQ 30;
-	
+    
   (** multiplicative operators *)
   Hashtbl.add Parser.binop_precedence Token.TIMES 40;   
   Hashtbl.add Parser.binop_precedence Token.DIVIDE 40;
   Hashtbl.add Parser.binop_precedence Token.DIV 40;
   Hashtbl.add Parser.binop_precedence Token.MOD 40;
-	
-	
-	(** additive operators *)
+    
+    
+    (** additive operators *)
   Hashtbl.add Parser.binop_precedence Token.PLUS 50;
   Hashtbl.add Parser.binop_precedence Token.MINUS 50;
-	
-	(** multiplicative operators *)
-	Hashtbl.add Parser.binop_precedence Token.TIMES 60;   
-	Hashtbl.add Parser.binop_precedence Token.DIVIDE 60;
-	Hashtbl.add Parser.binop_precedence Token.DIV 60;
-	Hashtbl.add Parser.binop_precedence Token.MOD 60; 
-	
-	(** unary operators *)
-	Hashtbl.add Parser.binop_precedence Token.MINUS 70; (** highest priority *)   
-	Hashtbl.add Parser.binop_precedence Token.NOT 70; 
-	Hashtbl.add Parser.binop_precedence Token.PLUS 70;     
-	
-	
+    
+    (** multiplicative operators *)
+    Hashtbl.add Parser.binop_precedence Token.TIMES 60;   
+    Hashtbl.add Parser.binop_precedence Token.DIVIDE 60;
+    Hashtbl.add Parser.binop_precedence Token.DIV 60;
+    Hashtbl.add Parser.binop_precedence Token.MOD 60; 
+    
+    (** unary operators *)
+    Hashtbl.add Parser.binop_precedence Token.MINUS 70; (** highest priority *)   
+    Hashtbl.add Parser.binop_precedence Token.NOT 70; 
+    Hashtbl.add Parser.binop_precedence Token.PLUS 70;     
+    
+    
 
 
 (* reopen stream - this time for actual code generation *)
 (* real code - to be put back *)
  
   let cmdLineList = Array.to_list(Sys.argv) in
-	
-	print_endline "main() - command line arguments";
+    
+    print_endline "main() - command line arguments";
   List.map (fun x -> print_string " "; print_string x; x) cmdLineList;
-	print_endline "";
-	
-	
+    print_endline "";
+    
+    
   let printDebugStreamOn = List.exists (fun x -> x = "-d") cmdLineList in
   let parserUnitTestOn = List.exists (fun x -> x = "-u") cmdLineList in
   let typeCheckUnitTestOn = List.exists (fun x -> x = "-t") cmdLineList in
 
-	
+    
   if printDebugStreamOn then
-	begin
-		(* First open and parse to see token stream generated, for debug purposes - *)
-		(* NOT required *)
+    begin
+        (* First open and parse to see token stream generated, for debug purposes - *)
+        (* NOT required *)
 
     flush stdout;
-	print_endline "main() - debug stream";
+    print_endline "main() - debug stream";
     let fstreamDebug = 
       Lexer.lex 1 1 [0]  (Stream.of_channel (open_in Sys.argv.(1)))  in
-		print_string "file used:" ; print_endline  Sys.argv.(1);
+        print_string "file used:" ; print_endline  Sys.argv.(1);
 
     (* dump stream to stdout *)
     Stream.iter
@@ -160,7 +160,7 @@ let main () =
        | _ -> print_endline "stream: somthing extra"
        
     ) fstreamDebug
-	end;
+    end;
 
   print_endline "main() - opening input (source) file stream";   
   let fstream = Lexer.lex 1 1 [0]  (Stream.of_channel (open_in Sys.argv.(1)))  in
@@ -169,7 +169,7 @@ let main () =
        *)
 
   print_endline "main() - initializing global context";   
-  let glbContext = glb_init in 	 
+  let glbContext = glb_init in   
 
 
 (*
@@ -189,7 +189,7 @@ let main () =
     let fstream010 = Lexer.lex 1 1 [0]  (Stream.of_channel (open_in "../mixTests/parser/uTest010.mx"))  in
     let fstream011 = Lexer.lex 1 1 [0]  (Stream.of_channel (open_in "../mixTests/parser/uTest011.mx"))  in
     let fstream012 = Lexer.lex 1 1 [0]  (Stream.of_channel (open_in "../mixTests/parser/uTest012.mx"))  in
-	
+    
     unitTestForParser fstream001 UTest001.pTest001 glbContext "pTest001: ";
     unitTestForParser fstream002 UTest002.pTest002 glbContext "pTest002: ";
     unitTestForParser fstream003 UTest003.pTest003 glbContext "pTest003: ";
@@ -212,7 +212,7 @@ let main () =
  begin
  
 (*
-		print_string "tTest001 - ";
+        print_string "tTest001 - ";
     let typeSt001 =  Stack.create () in    
         SymTbl.sym_add_level_to_typ_symtbl typeSt001;
         print_string "tTest001 result: "; print_endline (Typecheck.typechk_print_error (TTest001.test typeSt001 ));
@@ -223,7 +223,7 @@ let main () =
     let tSt001 =  Stack.create () in
         SymTbl.sym_add_level_to_typ_symtbl tSt001;
         print_string "tTestxxx001 result: "; Typesymtbl.typesymtbl_print_error TTest001.tTableTest tSt001 TTest001.tsymTest001;
-				glb_init
+                glb_init
 *)
 (*
     print_string "tTest002 - ";
@@ -233,8 +233,8 @@ let main () =
 
     print_string "tTest003 - ";
     let typeSt003 =  Stack.create () in    
-        SymTbl.sym_add_level_to_typ_symtbl typeSt003;			
-    print_string "tTest003 result: "; print_endline	(Typecheck.typechk_print_error (TTest003.test typeSt003));
+        SymTbl.sym_add_level_to_typ_symtbl typeSt003;           
+    print_string "tTest003 result: "; print_endline (Typecheck.typechk_print_error (TTest003.test typeSt003));
 
     print_string "tTest004 - ";
     let typeSt004 =  Stack.create () in    
@@ -278,11 +278,11 @@ end;
  if not (typeCheckUnitTestOn || parserUnitTestOn) then
  begin
 
-(*		
+(*      
       let astAndGbl = Parser.parse_compilation_unit glbContext fstream in 
-			astAndGbl;
-			print_endline "************************done parsing only pass ************************";
-			
+            astAndGbl;
+            print_endline "************************done parsing only pass ************************";
+            
 *)
 
   let astAndGbl =   (*Typecheck.typechk_package type check activation *)
@@ -292,9 +292,9 @@ end;
 
 (*
     print_endline "print out AST Treee.";   
-				let astTree = fst astAndGbl in
-				AstPrint.print_ast_package astTree; 
-*)		
+                let astTree = fst astAndGbl in
+                AstPrint.print_ast_package astTree; 
+*)      
 
 (* only for testing needs trees, to be removed *)
 (*     let nl = (snd astAndGbl) in *)
@@ -376,13 +376,13 @@ end;
      print_endline "begin executing code generation process... disabled";
 
      let the_pack_code = CodegenC.codegen_doc (fst astAndGbl) (snd astAndGbl) in 
-				 the_pack_code;
+                 the_pack_code;
 
      print_endline "begin emitting C code process...";  
 
 
-			let theCode = Pgmvalues.get_c_code (snd astAndGbl) in
-					Queue.iter (fun cLine -> print_endline cLine) theCode;
+            let theCode = Pgmvalues.get_c_code (snd astAndGbl) in
+                    Queue.iter (fun cLine -> print_endline cLine) theCode;
 
       try
       let cout = open_out Sys.argv.(2) in
@@ -396,9 +396,9 @@ end;
         Format.printf "Cannot open file \"%s\": %s\n" Sys.argv.(1) (Printexc.to_string e)
 
 
-		
-	(*	  print_int (Queue.length theCode); *)
-	
+        
+    (*    print_int (Queue.length theCode); *)
+    
 end;;
 
 

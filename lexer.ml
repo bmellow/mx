@@ -363,7 +363,7 @@ and lex_equal ln col spstk = parser
 and lex_nequ ln col spstk = parser
   | [< ' ('='); stream >] ->
       [< 'Token.Token (Token.NEQUIV, ("NEQUIV",ln,col), []); lex ln (col+1) spstk stream >]
-  (* error condition: *) 		     
+  (* error condition: *)             
   | [<  >] -> raise (Stream.Error "lex_nequ: lexing error")
             
 and lex_fslash ln col spstk  = parser
@@ -373,7 +373,7 @@ and lex_fslash ln col spstk  = parser
   (* and: [/\] *)       
   | [< ' ('\\'); stream >] ->
       [< 'Token.Token (Token.LAND, ("LAND",ln,col), []) ; lex ln (col+1) spstk stream >]
-  (* divide: [/] *) 		     
+  (* divide: [/] *)              
   | [< stream  >] ->
       [< 'Token.Token (Token.DIVIDE, ("DIVIDE",ln,col), []) ; lex ln (col+1) spstk stream >]
  
@@ -390,7 +390,7 @@ and lex_gthen ln col spstk  = parser
   (* greaterthenequal [>=] *)       
   | [< ' ('='); stream >] ->
       [< 'Token.Token (Token.GEQ, ("GEQ",ln,col), []); lex ln (col+1) spstk stream >]
-  (* greater than: [>] *) 		     
+  (* greater than: [>] *)            
   | [< 'c; stream >] ->
       [< 'Token.Token (Token.GTR, ("GTR",ln,col), []); lex ln (col+1) spstk stream >]   
 
@@ -398,7 +398,7 @@ and lex_lthen ln col spstk = parser
   (* limply [<=] *)       
   | [< ' ('='); stream >] ->
       [< 'Token.Token (Token.FOLLOWS, ("FOLLOWS",ln,col), []); lex ln (col+1) spstk stream >]
-  (* less than: [<] *) 		     
+  (* less than: [<] *)           
   | [< 'c; stream >] ->
       [< 'Token.Token (Token.LSS, ("LSS",ln,col), []); lex ln (col+1) spstk stream >]       
 
@@ -439,7 +439,7 @@ and lex_indent sp ln col spstk = parser
       (* match !spaceStack with *)
       match spstk with 
 (*
-		     | h::t when sp=h ->            print_token_location "NL" ln col; 
+             | h::t when sp=h ->            print_token_location "NL" ln col; 
                                     print_string "indent: NL Spacing: "; print_int sp;
                                     print_string " Stack Head: "; print_int h; 
                                     print_endline ""; 
@@ -471,9 +471,9 @@ and lex_indent sp ln col spstk = parser
                                     print_stack spstk; 
                                     (* raise (Stream.Error "lex_ident")  *)
                                     [< lex ln col spstk stream >]
-																		
-		 | _ ->													
-																		raise (Stream.Error "indenting issue")
+                                                                        
+         | _ ->                                                 
+                                                                        raise (Stream.Error "indenting issue")
 
 
 

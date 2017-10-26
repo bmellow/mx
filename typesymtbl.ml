@@ -1,6 +1,6 @@
 (**
     This module will create an populate a symbol table containing the definitions
-		of classes and their attributes found in the AST.
+        of classes and their attributes found in the AST.
     
     It uses
     - module object, where functions and global variables are stored 
@@ -31,13 +31,13 @@ let get_class_name (cl, al, ml, cn) = cn
 (** This function takes a list for identifiers and a type
     and returns a list of tuples with the string identifers and 
     the passed in type.  This was created because the language
-		we are accepting allow variable declarations of the form
-		var x,y,z type. This function allows us to store such
-		values in the form (x,type), (y,type), (z,type) in the symbol
-		table.  Note that the LLVM types are placeholders at this point. 
-		@param    list of Ast identifiers
-		@param    Ast types
-		@return   list with (string, type) tuples *)  
+        we are accepting allow variable declarations of the form
+        var x,y,z type. This function allows us to store such
+        values in the form (x,type), (y,type), (z,type) in the symbol
+        table.  Note that the LLVM types are placeholders at this point. 
+        @param    list of Ast identifiers
+        @param    Ast types
+        @return   list with (string, type) tuples *)  
 let make_var_list idL t clsName packContext = 
    List.map (fun a -> match a with
                       | Ast.Identifier(id) -> SymTbl.STClsAttr(id,0,t, clsName )) idL
@@ -56,28 +56,28 @@ let make_formals_list fl methName clsName packContext=
    let idList = 
       List.map (fun a -> match a with
                       | (Ast.Identifier(id),t) -> id) fl in
-	 let dup = Pgmvalues.doesDupExist idList in
+     let dup = Pgmvalues.doesDupExist idList in
    match dup with
    | true -> let errStr = String.concat "" ["TypeError: Duplicate argument names in method: "; methName] in
                     raise (TypeError errStr)
    | false -> List.map (fun a -> match a with
                       | (Ast.Identifier(id),t) -> SymTbl.STClsAttr(id,0,t,clsName )) fl
-																										(* perhaps this should be really formal or something else  *)
+                                                                                                        (* perhaps this should be really formal or something else  *)
 
 
 
 
 (** This takes an ast class node and populates type symbol table with type information 
     relevant to that classlist and puts it information into the symbol table. 
-		Populated table is returned.  Note that the llvm types are placeholders ???? not sure yet. 
+        Populated table is returned.  Note that the llvm types are placeholders ???? not sure yet. 
         @param ast         abstract syntax tree
         @param symtbl      type symbol table to be populated
         
         @return            type symble table after population
 *)
 let typesymtbl_add_cls_member_list packlst ast =
-	let lst = snd packlst in
-	let packContext = fst packlst in 
+    let lst = snd packlst in
+    let packContext = fst packlst in 
   match ast with
         | Ast.MemConst(Ast.Identifier(id),t,vT,e) -> (packContext, ((SymTbl.STClsConst(id,t )) :: (get_const_list lst),  get_attr_list lst,  get_meth_list lst, get_class_name lst) )  
         | Ast.MemAttr(Ast.Variable(idL,t,vT)) ->     (packContext, (get_const_list lst, (make_var_list idL t  (get_class_name lst) packContext) @ (get_attr_list lst),get_meth_list lst,  get_class_name lst ))
@@ -87,90 +87,90 @@ let typesymtbl_add_cls_member_list packlst ast =
 
 (** This takes an ast class list node and populates type symbol table with types
     (class definitions). Function iteratively goes through each class in the 
-		list and puts it information into the symbol table. Populated table is returned
-		@param ast         abstract syntax tree
-		@param symtbl      type symbol table to be populated
-		
-		@return            type symble table after population
-		*)
+        list and puts it information into the symbol table. Populated table is returned
+        @param ast         abstract syntax tree
+        @param symtbl      type symbol table to be populated
+        
+        @return            type symble table after population
+        *)
 let typesymtbl_add_cls astAndGbl ast = 
-	let packContext = snd astAndGbl in
+    let packContext = snd astAndGbl in
   match ast with
   | Ast.Cls(Ast.Identifier(id), clsID, Ast.MemList(ml), nl, il, i) ->  
-        let packLsts = List.fold_left typesymtbl_add_cls_member_list (packContext, ([],[],[],id)) ml in	
+        let packLsts = List.fold_left typesymtbl_add_cls_member_list (packContext, ([],[],[],id)) ml in 
         let pack = fst packLsts in
         let lsts = snd packLsts in
-				
-				let tysymtbl =  Pgmvalues.get_typsymtbl pack in
-				
-				(* check for duplicate class names  *)
-				try
-					let errStr = String.concat "" ["typesymtbl_add_cls: see if class "; id ; " is already defined"] in 
-					print_endline errStr;
-					SymTbl.sym_get_symtbl_val tysymtbl id; 
-					
-					(* normal behaviour is if class name doesn't currently exist *)
-					let errStr = String.concat "" ["TypeError: Duplicate class names: "; id] in
-					raise (TypeError errStr)
+                
+                let tysymtbl =  Pgmvalues.get_typsymtbl pack in
+                
+                (* check for duplicate class names  *)
+                try
+                    let errStr = String.concat "" ["typesymtbl_add_cls: see if class "; id ; " is already defined"] in 
+                    print_endline errStr;
+                    SymTbl.sym_get_symtbl_val tysymtbl id; 
+                    
+                    (* normal behaviour is if class name doesn't currently exist *)
+                    let errStr = String.concat "" ["TypeError: Duplicate class names: "; id] in
+                    raise (TypeError errStr)
 
-				with SymTblError "sym_find_symbl: symbol could not be found" ->
+                with SymTblError "sym_find_symbl: symbol could not be found" ->
         begin  
           let errStr = String.concat "" ["typesymtbl_add_cls: Success. Class "; id ; " is not yet defined"] in 
              print_endline errStr;
-						
-					(* recurse the attributes to insert attribute indices to type symbol *)
-					(* entries. 																												 *)
+                        
+                    (* recurse the attributes to insert attribute indices to type symbol *)
+                    (* entries.                                                                                                                  *)
 
-					let al = List.fold_left  
-								(fun i a -> 
-										match a with
-										| SymTbl.STClsAttr(id,idx,t,cN ) -> 
-												let idxupd = SymTbl.STClsAttr(id,(fst i),t,cN ) in
-														((fst i) - 1, idxupd :: (snd i)))
-						
-								(* first argument to function, "i" *)
-								( (List.length (get_attr_list lsts))-1 ,[])
-								
-								(* list provide second arguement "a" *)
-								(get_attr_list lsts) in
-(*					
-					(* now create class type pointer using attribute information  *) 
-					let clsAttrList = List.map (fun a ->
-																match a with
-																|  SymTbl.STClsAttr(id,idx,t,cN ) -> 
-																	 let logStr = String.concat "" ["typesymtbl_add_cls: type symbol table class info: class: ";cN; ", attr: ";id; " index: "] in 
-             													print_string logStr; print_int idx; print_endline "";
-																	lt) 
-											(snd al) in
-											
-					let clsAttrArr = Array.of_list clsAttrList in
+                    let al = List.fold_left  
+                                (fun i a -> 
+                                        match a with
+                                        | SymTbl.STClsAttr(id,idx,t,cN ) -> 
+                                                let idxupd = SymTbl.STClsAttr(id,(fst i),t,cN ) in
+                                                        ((fst i) - 1, idxupd :: (snd i)))
+                        
+                                (* first argument to function, "i" *)
+                                ( (List.length (get_attr_list lsts))-1 ,[])
+                                
+                                (* list provide second arguement "a" *)
+                                (get_attr_list lsts) in
+(*                  
+                    (* now create class type pointer using attribute information  *) 
+                    let clsAttrList = List.map (fun a ->
+                                                                match a with
+                                                                |  SymTbl.STClsAttr(id,idx,t,cN ) -> 
+                                                                     let logStr = String.concat "" ["typesymtbl_add_cls: type symbol table class info: class: ";cN; ", attr: ";id; " index: "] in 
+                                                                print_string logStr; print_int idx; print_endline "";
+                                                                    lt) 
+                                            (snd al) in
+                                            
+                    let clsAttrArr = Array.of_list clsAttrList in
 
-       		(* define named type of class for program *)
-       		let nmTyp =  named_struct_type context id in
-         			struct_set_body nmTyp clsAttrArr false;    
+            (* define named type of class for program *)
+            let nmTyp =  named_struct_type context id in
+                    struct_set_body nmTyp clsAttrArr false;    
           
-       		(* constructs the class type, which is pointer to a stucture    *)
-       		(* containing the types of member variables of within the class *)
-       		let clsType = pointer_type nmTyp in 							 
-*)		
-			    SymTbl.sym_set_symtbl_val tysymtbl id 
-					   (SymTbl.STClsTyp(Ast.TypClsPtr(Ast.Identifier(id)),	 
-					   get_const_list lsts, (snd al), get_meth_list lsts, 
-						 (List.map (fun a ->       
-						  match a with
-							| s -> Ast.TypClsPtr(Ast.Identifier(s))) nl),
+            (* constructs the class type, which is pointer to a stucture    *)
+            (* containing the types of member variables of within the class *)
+            let clsType = pointer_type nmTyp in                              
+*)      
+                SymTbl.sym_set_symtbl_val tysymtbl id 
+                       (SymTbl.STClsTyp(Ast.TypClsPtr(Ast.Identifier(id)),   
+                       get_const_list lsts, (snd al), get_meth_list lsts, 
+                         (List.map (fun a ->       
+                          match a with
+                            | s -> Ast.TypClsPtr(Ast.Identifier(s))) nl),
              (List.map (fun a ->       
                           match a with
                             | s -> Ast.TypClsPtr(Ast.Identifier(s))) il)
-						 
+                         
             
             
             
             ));
                                     
              Hashtbl.add (Pgmvalues.get_needsTable packContext) id nl;
-				  astAndGbl
-				end
+                  astAndGbl
+                end
 
 
 (** Entry point and the only routine that should be called from outside of the module.
@@ -178,20 +178,20 @@ let typesymtbl_add_cls astAndGbl ast =
         particular package and decorates the symbol table containing types.  
     
     
-    @param astAndGbl		a tuple that contains the AST (via the root AST.Package node
-												and the global context object        
-		@return         symtbl table with types added in *)
+    @param astAndGbl        a tuple that contains the AST (via the root AST.Package node
+                                                and the global context object        
+        @return         symtbl table with types added in *)
 let typesymtbl_package astAndGbl = 
 
-	let ast = fst astAndGbl in
-	let packContext = snd astAndGbl in
-	print_endline "";
-	print_endline "begin executing type symbol generation process...";	
+    let ast = fst astAndGbl in
+    let packContext = snd astAndGbl in
+    print_endline "";
+    print_endline "begin executing type symbol generation process...";  
   match ast with
   | Ast.Package (i, Ast.ClsList(ul)) -> print_endline "typesymtbl_package: start"; 
-											List.fold_left typesymtbl_add_cls astAndGbl ul;
-											print_endline "typesymtbl_package: end";
-											(ast, packContext)
+                                            List.fold_left typesymtbl_add_cls astAndGbl ul;
+                                            print_endline "typesymtbl_package: end";
+                                            (ast, packContext)
   | Ast.Program (i, Ast.ClsList(ul), cs) -> print_endline "typesymtbl_program: start"; 
                                             List.fold_left typesymtbl_add_cls astAndGbl ul;
                                             print_endline "typesymtbl_program: end";
@@ -202,41 +202,41 @@ let typesymtbl_package astAndGbl =
 
 (** This function is used to print error messages associated
         with typecheck error
-        @param testFunc					function that returns a symbol table storing
-																types.	
-				@param symtbl						type symbol table.  The one is pass into the
-																test function.  It will be populated with
-																type information and will be basis of output
-																for the test function
-				@param testSymtblEnt		The test symtbl entry that we deem to be correct 
-																for this particular test case	    
+        @param testFunc                 function that returns a symbol table storing
+                                                                types.  
+                @param symtbl                       type symbol table.  The one is pass into the
+                                                                test function.  It will be populated with
+                                                                type information and will be basis of output
+                                                                for the test function
+                @param testSymtblEnt        The test symtbl entry that we deem to be correct 
+                                                                for this particular test case       
         @return                 none, just side effect of printing a description of 
-																the test result *)
+                                                                the test result *)
 let typesymtbl_print_error testFunc symtbl testSymtblEnt = 
-	 try		   
-		  begin		
+     try           
+          begin     
       match testSymtblEnt with
-			| SymTbl.STClsTyp(Ast.TypClsPtr(Ast.Identifier(id)), cl, al, ml, nl, il) ->				
-				  begin
-				  let resST = testFunc symtbl in
-				  let clsEntry = SymTbl.sym_get_symtbl_val resST id in
-					match clsEntry with
-					| SymTbl.STClsTyp(Ast.TypClsPtr(Ast.Identifier(id1)), cl1, al1, ml1, nl1, il1) ->
-						  if  (Pgmvalues.isListSame cl cl1 (List.length cl) ) &&
+            | SymTbl.STClsTyp(Ast.TypClsPtr(Ast.Identifier(id)), cl, al, ml, nl, il) ->             
+                  begin
+                  let resST = testFunc symtbl in
+                  let clsEntry = SymTbl.sym_get_symtbl_val resST id in
+                    match clsEntry with
+                    | SymTbl.STClsTyp(Ast.TypClsPtr(Ast.Identifier(id1)), cl1, al1, ml1, nl1, il1) ->
+                          if  (Pgmvalues.isListSame cl cl1 (List.length cl) ) &&
                   (Pgmvalues.isListSame al al1 (List.length al) ) then
-							    print_endline "TypeSymtbl success: yes"
-							else
-								  let errStr = String.concat "" 
+                                print_endline "TypeSymtbl success: yes"
+                            else
+                                  let errStr = String.concat "" 
                    ["TypeSymtbl success for class: "; id ] in
                   print_endline errStr
-					| _ -> let errStr = String.concat "" 
-									["TypeSymtbl error: "; id ; " class symtbl entry not in the correct format"] in
-									print_endline errStr
-				  end
-			| _ -> print_endline "TypeSymtbl error: test symtbl entry not in the correct format"
-			end
-	 with TypeError descr -> let errStr = String.concat "" ["typesymtbl_print_error: TypeError xxxerror:" ; descr] in 
-																	print_endline errStr
+                    | _ -> let errStr = String.concat "" 
+                                    ["TypeSymtbl error: "; id ; " class symtbl entry not in the correct format"] in
+                                    print_endline errStr
+                  end
+            | _ -> print_endline "TypeSymtbl error: test symtbl entry not in the correct format"
+            end
+     with TypeError descr -> let errStr = String.concat "" ["typesymtbl_print_error: TypeError xxxerror:" ; descr] in 
+                                                                    print_endline errStr
 
 
 

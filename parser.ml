@@ -22,11 +22,11 @@ let binop_precedence:(Token.tokentype, int) Hashtbl.t = Hashtbl.create 30
 
 (** precedence - Get the precedence of the pending binary operator token. *)
 let get_precedence tok = try Hashtbl.find binop_precedence tok 
-	                                            with Not_found -> -1
+                                                with Not_found -> -1
 
 
 let get_binary_operator tok =
-	match tok with
+    match tok with
   |  Token.LSS ->  Ast.ROpLT
   |  Token.GTR ->  Ast.ROpGT
   |  Token.LEQ ->  Ast.ROpLTE
@@ -52,18 +52,18 @@ let get_binary_operator tok =
     @return string related with token 
     @raise Error if input is a non-string token *) 
 let get_string_from_auxdata a =  
-	match a with 
-	Token.ST a -> a
-	| _ -> raise (Stream.Error "get_string_from_auxdata: trying to retrieve a non-string value")
+    match a with 
+    Token.ST a -> a
+    | _ -> raise (Stream.Error "get_string_from_auxdata: trying to retrieve a non-string value")
 
 (** This function is used to obtain a integer from the variant structure tokenauxdata
     @param string token
     @return string related with token 
     @raise Error if input is a non-string token *) 
 let get_int_from_auxdata a =  
-	match a with 
-	Token.IT a -> a
-	| _ -> raise (Stream.Error "get_int_from_auxdata: trying to retrieve a non-integer value")
+    match a with 
+    Token.IT a -> a
+    | _ -> raise (Stream.Error "get_int_from_auxdata: trying to retrieve a non-integer value")
 
 (** creates an AST subtree required for an expression found in the token stream. The 
     precedence is unary operators, primary elements, conjunction binary operators
@@ -80,9 +80,9 @@ let get_int_from_auxdata a =
 
 let rec parse_other_integers acc = parser
   | [< 'Token.Token ( Token.COMMA, (st,ln, col), al );
-			  'Token.Token ( Token.INT, (st1,ln1, col1), al1 );
-			il=parse_other_integers ((get_int_from_auxdata (List.hd al1))::acc) >] -> il
-	| [< >] -> []
+              'Token.Token ( Token.INT, (st1,ln1, col1), al1 );
+            il=parse_other_integers ((get_int_from_auxdata (List.hd al1))::acc) >] -> il
+    | [< >] -> []
 
 
 and parse_integer_list = parser
@@ -101,12 +101,12 @@ and parse_integer_list = parser
 
   
 and make_id_list lst = 
-	List.map (fun a -> Ast.Identifier a) lst 
+    List.map (fun a -> Ast.Identifier a) lst 
 
 and print_id_list arr = 
-	List.map (fun a -> print_string "parse.print_id_list - identifier found: "; 
-			print_endline a) arr
-				
+    List.map (fun a -> print_string "parse.print_id_list - identifier found: "; 
+            print_endline a) arr
+                
 
 and parse_other_identifiers acc = parser
   | [<  'Token.Token ( Token.COMMA, (st,ln, col), al ); 
@@ -116,10 +116,10 @@ and parse_other_identifiers acc = parser
 
 and parse_idlist = parser
  | [<  'Token.Token ( Token.IDENTIFIER, (st,ln, col), al ); idl=parse_other_identifiers [] >] -> 
- 		print_endline "parse_idlist: parse_idlist";
- 		let l = (get_string_from_auxdata (List.hd al))::( List.rev (idl)) in
- 		ignore(print_id_list l);
- 		l
+        print_endline "parse_idlist: parse_idlist";
+        let l = (get_string_from_auxdata (List.hd al))::( List.rev (idl)) in
+        ignore(print_id_list l);
+        l
 (* | [<  >] -> [] *)
 
 
@@ -163,31 +163,31 @@ let rec parse_primary = parser
              print_endline "parse_primary: designator";
              dn       
         end stream
-		
+        
 
  | [<'Token.Token ( Token.NEW, (st,ln, col), al ); 
      t=parse_type; stream >] ->
-		 begin parser
-		 | [<'Token.Token ( Token.LBRAK, (st,ln , col ), al  );
+         begin parser
+         | [<'Token.Token ( Token.LBRAK, (st,ln , col ), al  );
          e=parse_expression;
          'Token.Token ( Token.RBRAK, (st1,ln1, col1), al1 ) >] -> Ast.ExpNew((t,e,[]), [])
-		 | [< actl=parse_actuals >] -> Ast.ExpNew((t,Ast.ExpNone,actl), []) 
-		 | [< >] -> print_endline "parse_primary: new expression"; Ast.ExpNew((t,Ast.ExpNone,[]), [])
-		 end stream		
+         | [< actl=parse_actuals >] -> Ast.ExpNew((t,Ast.ExpNone,actl), []) 
+         | [< >] -> print_endline "parse_primary: new expression"; Ast.ExpNew((t,Ast.ExpNone,[]), [])
+         end stream     
 
 
-			(* remove supporting with clause for now *)
-			(*	
-						print_endline "parse_primary: new statement found";
-						begin parser
-						| [< 'Token.Token ( Token.WITH, (st,ln, col), al ); il=parse_idlist >] -> 
+            (* remove supporting with clause for now *)
+            (*  
+                        print_endline "parse_primary: new statement found";
+                        begin parser
+                        | [< 'Token.Token ( Token.WITH, (st,ln, col), al ); il=parse_idlist >] -> 
                  print_endline "parse_primary: new object statement with actuals and mixins found";
                  Ast.ExpNew( t, ex ,actl), make_id_list il)
             | [<  >] -> 
                  print_endline "parse_primary: new object statement with actuals";
                  Ast.ExpNew( t,ex,actl), [])
             end stream
-			*)
+            *)
 
 (*              
  | [<  dn=parse_dotted_name; stream >] ->
@@ -201,7 +201,7 @@ let rec parse_primary = parser
                 end stream
 *)
 
-			
+            
 
 (* binoprhs  ::= ('+' primary)*    *)
 and parse_bin_rhs expr_prec lhs stream =
@@ -209,8 +209,8 @@ and parse_bin_rhs expr_prec lhs stream =
   (* If this is a binop, find its precedence. *)
   | Some (Token.Token (c, (tokStr, ln, col), tokAuxDataList)) when Hashtbl.mem binop_precedence c ->
       let token_prec = get_precedence c in
-			print_string "parse_bin_rhs: Token "; print_string tokStr;
-			print_string " value: "; print_int token_prec;
+            print_string "parse_bin_rhs: Token "; print_string tokStr;
+            print_string " value: "; print_int token_prec;
       print_endline " found in precedence table";
 
       (* If this is a binop that binds at least as tightly as the current binop,
@@ -236,9 +236,9 @@ and parse_bin_rhs expr_prec lhs stream =
         in
 
         (* Merge lhs/rhs. *)
-				let bo = get_binary_operator c in
+                let bo = get_binary_operator c in
         let lhs = Ast.ExpBinary (bo, lhs, rhs) in
-				print_endline "parse_bin_rhs: Merge lhs/rhs";
+                print_endline "parse_bin_rhs: Merge lhs/rhs";
         parse_bin_rhs expr_prec lhs stream
       end
   | _ -> print_endline "parse_bin_rhs: lhs only"; lhs
@@ -247,19 +247,19 @@ and parse_bin_rhs expr_prec lhs stream =
 
 and parse_other_expressions acc = parser
   | [<  'Token.Token ( Token.COMMA, (st,ln, col), al ); 
-  			e=parse_expression; 
-  			el=parse_other_expressions (e::acc) >] ->  el
+            e=parse_expression; 
+            el=parse_other_expressions (e::acc) >] ->  el
   | [< >] ->  acc
 
 and parse_expression_list = parser
  | [<  e=parse_expression; el=parse_other_expressions [] >] -> 
         print_endline "parse_expression_list: parse_expression_list";
         e::( List.rev (el))
-				(*
-				let l = e::( List.rev (el)) in
+                (*
+                let l = e::( List.rev (el)) in
         ignore(print_id_list l);
-				*)
-				
+                *)
+                
 (* expression  ::= primary binoprhs *)
 and parse_expression = parser
   | [< lhs=parse_primary; stream >] -> parse_bin_rhs 0 lhs stream;
@@ -269,14 +269,14 @@ and parse_expression = parser
 
 and parse_optional_array_member = parser
  | [< 'Token.Token ( Token.ARRAY, (st,ln, col), al );
-			(*
-			'Token.Token ( Token.LBRAK, (st,ln, col), al )
-			il=parse_expression_list;
-			'Token.Token ( Token.RBRAK, (st,ln, col), al );
-			*)
-			'Token.Token ( Token.OF, (st,ln, col), al );
+            (*
+            'Token.Token ( Token.LBRAK, (st,ln, col), al )
+            il=parse_expression_list;
+            'Token.Token ( Token.RBRAK, (st,ln, col), al );
+            *)
+            'Token.Token ( Token.OF, (st,ln, col), al );
 >] -> print_endline "parse: parse_optional_array_member - optional array found";
-			[]
+            []
 
 (*
  | [< >] -> print_endline "optional_array_member: got here"; Ast.VTypPrivate
@@ -286,20 +286,20 @@ and parse_optional_array_member = parser
 (* note in this implementation type is always preceded by a colon *)
 
 and parse_type = parser
- 		| [< il=parse_optional_array_member; stream >] ->
-			  begin parser
-		    | [< 'Token.Token ( Token.INTEGER, (st,ln, col), al ) >] -> 
- 			        print_endline "parse_type: INTEGER array type found";
- 			        Ast.TypArr(il, Ast.TypInt)
- 		    | [< 'Token.Token ( Token.BOOLEAN, (st,ln, col), al ) >] ->  
- 			        print_endline "parse_type: - BOOLEAN array type found";
+        | [< il=parse_optional_array_member; stream >] ->
+              begin parser
+            | [< 'Token.Token ( Token.INTEGER, (st,ln, col), al ) >] -> 
+                    print_endline "parse_type: INTEGER array type found";
+                    Ast.TypArr(il, Ast.TypInt)
+            | [< 'Token.Token ( Token.BOOLEAN, (st,ln, col), al ) >] ->  
+                    print_endline "parse_type: - BOOLEAN array type found";
                     Ast.TypArr(il, Ast.TypBool)
- 		    | [< 'Token.Token ( Token.IDENTIFIER, (st1, ln1, col1), al1) >] ->  
- 			       print_endline "parse_type: - CLASS array type found";
-							      Ast.TypArr(il, Ast.TypClsPtr(Ast.Identifier(get_string_from_auxdata (List.hd al1)) ) )
- 			       (*Ast.TypArrClsPtr(Ast.Identifier(get_string_from_auxdata (List.hd al1)), il) *)
-				end stream
-				
+            | [< 'Token.Token ( Token.IDENTIFIER, (st1, ln1, col1), al1) >] ->  
+                   print_endline "parse_type: - CLASS array type found";
+                                  Ast.TypArr(il, Ast.TypClsPtr(Ast.Identifier(get_string_from_auxdata (List.hd al1)) ) )
+                   (*Ast.TypArrClsPtr(Ast.Identifier(get_string_from_auxdata (List.hd al1)), il) *)
+                end stream
+                
     | [< 'Token.Token ( Token.INTEGER, (st,ln, col), al ) >] -> 
             print_endline "parse_type: - INTEGER type found";
             Ast.TypInt
@@ -321,8 +321,8 @@ and parse_type = parser
 (* formals        ::= ["(" idList ":" type {"," idList ":" type } ")"]  *)
 
 and make_formal_list lst t = 
-	List.map (   fun a -> (Ast.Identifier(a),t)    ) lst
-	
+    List.map (   fun a -> (Ast.Identifier(a),t)    ) lst
+    
 
 and parse_other_formals acc = parser
  | [<  'Token.Token ( Token.COMMA, (st, ln, col), al ); 
@@ -333,10 +333,10 @@ and parse_other_formals acc = parser
  l=parse_other_formals (  
  ((make_formal_list args t)@[(Ast.Identifier(get_string_from_auxdata (List.hd al1)),t)])@acc  
  ) >] 
- 	-> 
- 		print_string "parse_other_formals: formal in list: "; 
- 		print_endline (get_string_from_auxdata (List.hd al1));
- 		l
+    -> 
+        print_string "parse_other_formals: formal in list: "; 
+        print_endline (get_string_from_auxdata (List.hd al1));
+        l
  | [<  >] -> acc
 
 and parse_formals = parser
@@ -344,7 +344,7 @@ and parse_formals = parser
  | [< 'Token.Token ( Token.LPAREN, (st, ln, col), al ); stream>] ->
       begin parser
       
-			| [< args=parse_idlist; 'Token.Token ( Token.COLON, (st,ln, col), al ); t=parse_type; f=parse_other_formals []; 
+            | [< args=parse_idlist; 'Token.Token ( Token.COLON, (st,ln, col), al ); t=parse_type; f=parse_other_formals []; 
       'Token.Token ( Token.RPAREN, (st2, ln2, col2), al2) >] ->
               print_string "parse_formals: - first formal in list: "; 
               List.rev ( (make_formal_list args t)@f ) 
@@ -370,21 +370,21 @@ and parse_optional_rparen = parser
 
 and parse_other_actuals acc = parser
  | [<  'Token.Token(Token.COMMA, (id, ln, col), al); e=parse_expression; 
- 	l=parse_other_actuals ( e::acc  ) >] -> l
+    l=parse_other_actuals ( e::acc  ) >] -> l
  | [<  >] -> acc
 
 and parse_actuals = parser
  | [< lp=parse_optional_lparen; stream >] ->
 
- 		begin parser
+        begin parser
  (* TODO: fix to allow expressions eventually *) 
-  		| [< rp=parse_optional_rparen >] ->
- 		            print_endline "parse_actuals: empty actual list";
- 		            []
- 			| [< e=parse_expression;  al=parse_other_actuals [] ; rp=parse_optional_rparen >] ->
- 		             print_endline "parse_actuals: actuals list end"; 
- 		            List.rev (e::al)   		            
- 		end stream 
+        | [< rp=parse_optional_rparen >] ->
+                    print_endline "parse_actuals: empty actual list";
+                    []
+            | [< e=parse_expression;  al=parse_other_actuals [] ; rp=parse_optional_rparen >] ->
+                     print_endline "parse_actuals: actuals list end"; 
+                    List.rev (e::al)                    
+        end stream 
 
 
 
@@ -394,14 +394,14 @@ and parse_actuals = parser
 (** designator    ::= identifier { ["."] identifier | actuals }                       
  TODO: need to fix, actuals don't need period *)
 
-								
+                                
 and parse_other_dotted_names acc = parser
   | [<  'Token.Token ( Token.PERIOD, (st,ln, col), al ); 
-  			'Token.Token ( Token.IDENTIFIER, (st1,ln1, col1), al1 ); 
-  			d=parse_other_dotted_names (					
-				(Ast.DNID(Ast.Identifier(get_string_from_auxdata(List.hd al1))))  
-				::acc) >] ->  d
-	 | [< 'Token.Token ( Token.LBRAK, (st,ln, col), al );
+            'Token.Token ( Token.IDENTIFIER, (st1,ln1, col1), al1 ); 
+            d=parse_other_dotted_names (                    
+                (Ast.DNID(Ast.Identifier(get_string_from_auxdata(List.hd al1))))  
+                ::acc) >] ->  d
+     | [< 'Token.Token ( Token.LBRAK, (st,ln, col), al );
         il=parse_expression_list;
         'Token.Token ( Token.RBRAK, (st,ln, col), al );
         d=parse_other_dotted_names (                    
@@ -417,15 +417,15 @@ and parse_dotted_name = parser
                Ast.DottedName(l::(List.rev dnl))   
 (* | [< >] -> [] *)
 
-																																																																																																
-(** identifier { "." identifier | "[" integer {, integer } "]" }    *)																																																																																																																																																																																																																																																																																																
+                                                                                                                                                                                                                                                                                                                                                                                                
+(** identifier { "." identifier | "[" integer {, integer } "]" }    *)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              
 and parse_designator = parser
 
  | [< dn=parse_dotted_name; stream>] ->
-			begin parser
-			| [<a=parse_actuals>]	-> Ast.ExpFuncCall(Ast.Designator(dn, a))  
-			| [< >] -> Ast.ExpDes(Ast.Designator(dn, []))
-			end stream         	
+            begin parser
+            | [<a=parse_actuals>]   -> Ast.ExpFuncCall(Ast.Designator(dn, a))  
+            | [< >] -> Ast.ExpDes(Ast.Designator(dn, []))
+            end stream          
  
 
 and parse_else = parser
@@ -433,12 +433,12 @@ and parse_else = parser
  | [< (*'Token.Token(Token.NL, (id, ln, col), al); *)
       'Token.Token(Token.ESLE, (id, ln, col), al); el=parse_statement_suite>] -> 
       print_endline "parse_else: else part parsed";  el
- | [< >] -> print_endline "parse_else: no else part found"; Ast.Compound([])	
+ | [< >] -> print_endline "parse_else: no else part found"; Ast.Compound([])    
  
 and parse_if = parser
 
  | [< 'Token.Token(Token.THN, (id, ln, col), al); th=parse_statement_suite;  el=parse_else>] ->
- 	print_endline "parse_if: if statement parsed";(th,el) 
+    print_endline "parse_if: if statement parsed";(th,el) 
 
 
 
@@ -485,19 +485,19 @@ and parse_local_variable_suite = parser
    >] -> print_endline "parse_local_variable_suite - statement list found"; ll         
    
 
-																																																							
-																																																																		
-																																																																																								
+                                                                                                                                                                                                                            
+                                                                                                                                                                                                                                                                        
+                                                                                                                                                                                                                                                                                                                                                                
 (** compound_statement(t)  ::= "if" expression "then" compound [[NL] "else" compound]        
                     | "while" expression "do" compound                               
-                    | local_variable_list statement suite                               *)				  
+                    | local_variable_list statement suite                               *)                
 and parse_compound_statement = parser
  | [< 'Token.Token ( Token.IF, (st,ln, col), al); e=parse_expression; i=parse_if >] -> 
-		print_endline "parse_statement - if statement found"; Ast.StmtIf(e, fst i, snd i) 
+        print_endline "parse_statement - if statement found"; Ast.StmtIf(e, fst i, snd i) 
  | [< 'Token.Token ( Token.WHILE, (st,ln, col), al); e=parse_expression;
-			'Token.Token ( Token.DO, (st1,ln1, col1), al1); c=parse_statement_suite 
+            'Token.Token ( Token.DO, (st1,ln1, col1), al1); c=parse_statement_suite 
       >] -> 
-		print_endline "parse_statement - while statement found"; Ast.StmtWhile(e,c) 
+        print_endline "parse_statement - while statement found"; Ast.StmtWhile(e,c) 
 
  | [<  ll=parse_local_variable_list; c=parse_statement_suite >] -> 
        print_endline "parse_statement - var statement found - local variables"; Ast.StmtLocals(Ast.Locals(ll),c)
@@ -506,14 +506,14 @@ and parse_compound_statement = parser
  | [<  c=parse_statement_suite >] -> 
        print_endline "parse_statement - var statement found"; Ast.StmtLocals(Ast.Locals([]),c)
 *)
-	
+    
 
 
 
 
 
 (** simple_statement(t)  ::= raise
-										| designator [":=" expression] 
+                                        | designator [":=" expression] 
                     | "if" expression "then" compound [[NL] "else" compound]        
                     | "while" expression "do" compound                               
                     | variable compound                                             
@@ -523,18 +523,18 @@ and parse_compound_statement = parser
                     | "implement" dotted_name "with" identifier list                          
                     | "remove" identifier "from" dotted_name 
                     | "replace" identifier "with" identifer "in" dotted_name 
-								                       *)                 
+                                                       *)                 
 and parse_simple_statement = parser
  | [< 'Token.Token ( Token.RAISE, (st,ln, col), al) >] -> 
         print_endline "parse_statement - raise statement found"; Ast.StmtRaise     
-			     
+                 
  | [< d=parse_designator; stream >] ->
-	    begin parser
-			 | [< 'Token.Token ( Token.BECOMES, (st2,ln2, col2), al2); e=parse_expression >] -> 
-      			print_endline "parse_simple_statement - becomes statement found"; Ast.StmtDesign(d,e) 
-			 | [< >] -> Ast.StmtProcCall(d) 		
+        begin parser
+             | [< 'Token.Token ( Token.BECOMES, (st2,ln2, col2), al2); e=parse_expression >] -> 
+                print_endline "parse_simple_statement - becomes statement found"; Ast.StmtDesign(d,e) 
+             | [< >] -> Ast.StmtProcCall(d)         
       end stream
-			
+            
  | [< 'Token.Token ( Token.RETURN, (st,ln, col), al); stream >] ->
       begin parser
       | [< e=parse_expression >] -> print_endline "parse_simple_statement - return statement found"; Ast.StmtRet(e)
@@ -555,9 +555,9 @@ and parse_simple_statement = parser
       >] -> print_endline "parse_simple_statement - implement statement found";
             Ast.StmtImplement(dn, make_id_list il )
  | [< 'Token.Token ( Token.REMOVE, (st,ln, col), al);
-			il=parse_idlist; 
+            il=parse_idlist; 
       'Token.Token ( Token.FROM, (st2,ln2, col2), al2 );
-			dn=parse_designator
+            dn=parse_designator
       >] -> print_endline "parse_simple_statement - remove statement found";
             Ast.StmtRemove(dn, make_id_list il )
  | [< 'Token.Token ( Token.REPLACE, (st,ln, col), al);
@@ -578,7 +578,7 @@ and parse_other_simple_semicolon_statements acc = parser
         s=parse_simple_statement;
         sl=parse_other_simple_semicolon_statements (s::acc)
         >] ->  sl
-								
+                                
   | [< >] ->  acc
 
 
@@ -592,18 +592,18 @@ and parse_other_simple_statements acc = parser
 
 and parse_simple_statement_list = parser
  | [< s=parse_simple_statement; stream >] ->
-				begin parser
-				| [< sscl=parse_other_simple_semicolon_statements [] >] -> 
-						print_endline "parse_simple_statements - simple statement list found"; 
-						(  s::(List.rev sscl)  )
-	(*
+                begin parser
+                | [< sscl=parse_other_simple_semicolon_statements [] >] -> 
+                        print_endline "parse_simple_statements - simple statement list found"; 
+                        (  s::(List.rev sscl)  )
+    (*
         | [< sl=parse_other_simple_statements [] >] -> 
             print_endline "parse_simple_statements - simple statement list found"; 
             (  s::(List.rev sl)  )
-				| [< >] -> [s]	
+                | [< >] -> [s]  
 
   *)
-				end stream
+                end stream
 
 
 (** statement  ::= simple_statement_list | compound_statement *)
@@ -612,36 +612,36 @@ and parse_statement = parser
    >] -> print_endline "parse_statement - simple statement list found"; sl            
 
  | [< c=parse_compound_statement >] 
-			-> print_endline "parse_statement - compound statement"; [c]         
- 											
+            -> print_endline "parse_statement - compound statement"; [c]         
+                                            
 and parse_other_statements acc = parser
   | [< 
-				s=parse_statement;
+                s=parse_statement;
         sl=parse_other_statements (List.append s acc)
         >] ->  sl
   | [< >] ->  acc
 
 and parse_statements = parser
  | [< s=parse_statement ; sl=parse_other_statements []  >] -> 
-				print_endline "parse_statements - statement list found"; ( List.append s  (List.rev sl)  )
-																           
+                print_endline "parse_statements - statement list found"; ( List.append s  (List.rev sl)  )
+                                                                           
 
 
 (** statement_suite  ::= simple_statement_list  | INDENT statement {statement} DEDENT *)
 and parse_statement_suite = parser
  | [< sl=parse_simple_statement_list
-   >] -> print_endline "parse_statement_suite - simple statement list found"; Ast.Compound(sl)			
+   >] -> print_endline "parse_statement_suite - simple statement list found"; Ast.Compound(sl)          
 
  | [< 
-	    'Token.Token ( Token.INDENT, (st2,ln2, col2), al2 );
-			sl=parse_statements;
+        'Token.Token ( Token.INDENT, (st2,ln2, col2), al2 );
+            sl=parse_statements;
       'Token.Token ( Token.DEDENT, (st3,ln3, col3), al3 ) 
    >] -> print_endline "parse_statement_suite - statement list found"; Ast.Compound(sl)         
-		             
+                     
 
 (** method ::= "method" identifier [formals] [":" type] statement_suite *)
 and parse_method = parser
-			
+            
  | [< 'Token.Token ( Token.METHOD, ("METHOD" ,ln, col), al ); 
       'Token.Token ( Token.IDENTIFIER, (st1,ln1, col1), al1 ); stream
      >]  ->
@@ -649,7 +649,7 @@ and parse_method = parser
         | [<fl=parse_formals; stream>] ->
                         begin parser
                         | [< 'Token.Token ( Token.COLON, (st,ln, col), al );
-												      t=parse_type; cd=parse_statement_suite >] ->
+                                                      t=parse_type; cd=parse_statement_suite >] ->
                                       print_endline "parse_signature: formals and type found";     
                                       Ast.MemMeth(Ast.Identifier (get_string_from_auxdata(List.hd al1)), fl, t, cd, false)
                         | [< cd=parse_statement_suite >] ->
@@ -658,7 +658,7 @@ and parse_method = parser
                         end stream
                          
         | [< 'Token.Token ( Token.COLON, (st,ln, col), al );
-				     t=parse_type; cd=parse_statement_suite >] ->  
+                     t=parse_type; cd=parse_statement_suite >] ->  
             print_endline "parse_signature: formals and no type found";     
             Ast.MemMeth(Ast.Identifier (get_string_from_auxdata(List.hd al1)), [], t, cd,false)                    
 
@@ -737,7 +737,7 @@ let parse_member = parser
 
  | [< m=parse_method >] -> print_endline "parse_member: method member found"; m
  | [< i=parse_init >] -> print_endline "parse_member: init member found"; i
-			
+            
 
              
 let rec parse_other_members acc = parser
@@ -784,32 +784,32 @@ let parse_optional_clsinherits = parser
 
 
 (** class        ::= "class" identifier [EXTENDS idlist] [IMPLEMENTS idlist] [INHERITS id]
-											INDENT member {NL member} DEDENT   *)
+                                            INDENT member {NL member} DEDENT   *)
 let rec parse_class  = parser
  | [<   'Token.Token ( Token.CLASS, ("CLASS",ln, col), al );
- 		'Token.Token ( Token.IDENTIFIER, (st1,ln1, col1), al1 );
-		nl=parse_optional_clsextends;	
-		il=parse_optional_clsimplements;
-		h=parse_optional_clsinherits;
- 		'Token.Token ( Token.INDENT, (st2,ln2, col2), al2 );
- 		ml=parse_member_list;
- 		'Token.Token ( Token.DEDENT, (st3,ln3, col3), al3 )>] -> 
- 		print_string "parse: parse_class - class found: ";
- 		print_endline (get_string_from_auxdata (List.hd al1));
- 		
-		Ast.Cls(
-			(Ast.Identifier (get_string_from_auxdata (List.hd al1)), 1,
- 			(* (get_llvm_cls_int (get_string_from_auxdata (List.hd al1)) packContext), *)
-			Ast.MemList(ml), nl, il, h))
+        'Token.Token ( Token.IDENTIFIER, (st1,ln1, col1), al1 );
+        nl=parse_optional_clsextends;   
+        il=parse_optional_clsimplements;
+        h=parse_optional_clsinherits;
+        'Token.Token ( Token.INDENT, (st2,ln2, col2), al2 );
+        ml=parse_member_list;
+        'Token.Token ( Token.DEDENT, (st3,ln3, col3), al3 )>] -> 
+        print_string "parse: parse_class - class found: ";
+        print_endline (get_string_from_auxdata (List.hd al1));
+        
+        Ast.Cls(
+            (Ast.Identifier (get_string_from_auxdata (List.hd al1)), 1,
+            (* (get_llvm_cls_int (get_string_from_auxdata (List.hd al1)) packContext), *)
+            Ast.MemList(ml), nl, il, h))
 
  (* | [<  >] -> print_endline "parse: parse_class_list - no classes found.";  [] *)
 
 
 let rec parse_other_classes acc = parser
   | [< 
- 		c=parse_class;
- 		cl=parse_other_classes (c::acc)
- 		>] ->  print_endline "parse_other_class:"; cl
+        c=parse_class;
+        cl=parse_other_classes (c::acc)
+        >] ->  print_endline "parse_other_class:"; cl
   | [< >] ->  acc
 
 let rec parse_class_list  = parser
@@ -820,13 +820,13 @@ let rec parse_class_list  = parser
 let parse_package = parser
 
  | [< 'Token.Token ( Token.PACKAGE, (st,ln, col), al );  
-		'Token.Token ( Token.IDENTIFIER, (st1,ln1, col1), al1 );
-		'Token.Token ( Token.INDENT, (st2,ln2, col2), al2 ); 
-		 ul=parse_class_list; 
+        'Token.Token ( Token.IDENTIFIER, (st1,ln1, col1), al1 );
+        'Token.Token ( Token.INDENT, (st2,ln2, col2), al2 ); 
+         ul=parse_class_list; 
     'Token.Token ( Token.DEDENT, (st3,ln3, col3), al3 )
-		>] -> 
-		print_endline "parse_document() - begin parsing process";
-		Ast.Package( Ast.Identifier (get_string_from_auxdata (List.hd al1)), Ast.ClsList(ul)  ) 
+        >] -> 
+        print_endline "parse_document() - begin parsing process";
+        Ast.Package( Ast.Identifier (get_string_from_auxdata (List.hd al1)), Ast.ClsList(ul)  ) 
 
 
 (** program    ::= "program" identifier INDENT class {NL class} "begin" statement suite "end" DEDENT *)
@@ -836,7 +836,7 @@ let parse_program  = parser
         'Token.Token ( Token.IDENTIFIER, (st1,ln1, col1), al1 );
         'Token.Token ( Token.INDENT, (st2,ln2, col2), al2 ); 
         ul=parse_class_list;
-        'Token.Token ( Token.BEGIN, (st3,ln3, col3), al3 ); 				 
+        'Token.Token ( Token.BEGIN, (st3,ln3, col3), al3 );                  
         st=parse_statement_suite;
         'Token.Token ( Token.ED, (st4,ln4, col4), al4 ); 
         'Token.Token ( Token.DEDENT, (st5,ln5, col5), al5 ) 
@@ -899,7 +899,7 @@ let parse_compilation_unit packContext = parser
 
  | [< ss=parse_expression >]  
     -> print_endline "expression found - great";
-		(Ast.Package( Ast.Identifier ("exp"), Ast.UniList([])  ) , packContext) 
+        (Ast.Package( Ast.Identifier ("exp"), Ast.UniList([])  ) , packContext) 
 
  | [< dn=parse_dotted_name >]  
     -> print_endline "dotted name found - great";
